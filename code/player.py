@@ -9,7 +9,7 @@ class Player(pygame.sprite.Sprite):
 
         #movement
         self.direction = vector()
-        self.speed = 1.5
+        self.speed = 250
 
     def input(self):
         keys = pygame.key.get_pressed()
@@ -24,10 +24,10 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_d]:
             input_vector.x = 1
         
-        self.direction = input_vector
+        self.direction = input_vector.normalize() if input_vector else input_vector
        
-    def move(self):
-        self.rect.topleft += self.direction * self.speed
-    def update(self):
+    def move(self, dt):
+        self.rect.topleft += self.direction * self.speed * dt
+    def update(self, dt):
         self.input()
-        self.move()
+        self.move(dt)
