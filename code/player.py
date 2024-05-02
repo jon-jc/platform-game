@@ -55,6 +55,9 @@ class Player(pygame.sprite.Sprite):
             if self.jump:
                 if self.on_surface['floor']:
                     self.direction.y = -self.jump_height
+                elif any((self.on_surface['left'], self.on_surface['right'])):
+                    self.direction.y = -self.jump_height
+                    self.direct.x = 1 if self.on_surface['left'] else -1
                 self.jump = False
             
             
