@@ -22,7 +22,7 @@ class Player(pygame.sprite.Sprite):
         self.on_surface = {'floor': False, 'left': False, 'right': False}
 
         #timer
-        self.timer = {
+        self.timers = {
             'wall jump': Timer(200),
         }
         
@@ -30,7 +30,7 @@ class Player(pygame.sprite.Sprite):
         keys = pygame.key.get_pressed()
         input_vector = vector(0,0)
 
-        if not self.timer['wall jump'].active:
+        if not self.timers['wall jump'].active:
             
             if keys[pygame.K_a]:
                 input_vector.x = -1
@@ -64,21 +64,13 @@ class Player(pygame.sprite.Sprite):
             if self.on_surface['floor']:
                 self.direction.y = -self.jump_height
             elif any((self.on_surface['left'], self.on_surface['right'])):
-                self.timer['wall jump'].activate()
+                self.timers['wall jump'].activate()
                 self.direction.y = -self.jump_height
                 self.direction.x = 1 if self.on_surface['left'] else -1
+                
             self.jump = False
 
         self.collision('vertical')
-        
-        
-        
-       
-        
-        
-
-        
-        
         
             
             
@@ -110,12 +102,12 @@ class Player(pygame.sprite.Sprite):
                         
                 
     def update_timers(self):
-        for timer in self.timer.values():
+        for timer in self.timers.values():
             timer.update()
 
     def update(self, dt):
         self.old_rect = self.rect.copy()
-        self.update_timers
+        self.update_timers()
         self.input()
         self.move(dt)
         self.check_contact()
