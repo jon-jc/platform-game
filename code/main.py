@@ -13,7 +13,7 @@ class Game:
         self.tmx_maps = {0: load_pygame(join('.', 'data', 'levels', 'omni.tmx'))}
         self.current_stage = Level(self.tmx_maps[0] )
 
-        
+    
 
 
     def run(self):
