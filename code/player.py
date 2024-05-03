@@ -23,7 +23,8 @@ class Player(pygame.sprite.Sprite):
 
         #timer
         self.timers = {
-            'wall jump': Timer(200),
+            'wall jump': Timer(400),
+            'wall slide block': Timer(250)
         }
         
     def input(self):
@@ -44,13 +45,14 @@ class Player(pygame.sprite.Sprite):
             self.jump = True
             
             
+            
     def move(self, dt):
         #horizontal
         self.rect.x += self.direction.x * self.speed * dt
         self.collision('horizontal')
 
         #vertical
-        if not self.on_surface['floor'] and any((self.on_surface['left'], self.on_surface['right'])):
+        if not self.on_surface['floor'] and any((self.on_surface['left'], self.on_surface['right'])) and not self.timers['wall slide block'].active:
             self.direction.y = 0
             self.rect.y += self.gravity / 10 * dt
         else:
@@ -63,7 +65,8 @@ class Player(pygame.sprite.Sprite):
         if self.jump:
             if self.on_surface['floor']:
                 self.direction.y = -self.jump_height
-            elif any((self.on_surface['left'], self.on_surface['right'])):
+                self.timers['wall slide block'].activate()
+            elif any((self.on_surface['left'], self.on_surface['right'])) and not self.timers['wall slide block'].active:
                 self.timers['wall jump'].activate()
                 self.direction.y = -self.jump_height
                 self.direction.x = 1 if self.on_surface['left'] else -1
