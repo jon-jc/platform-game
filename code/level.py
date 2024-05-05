@@ -33,16 +33,17 @@ class Level:
         #moving tiles
         for obj in tmx_map.get_layer_by_name('Moving Objects'):
             if obj.name == 'helicopter':
-                if obj.width > obj.height:
+                if obj.width > obj.height: # horizontal
                     move_dir = 'x'
                     start_pos = (obj.x, obj.y + obj.height / 2)
-                    end_pos = (obj.x + obj.width, obj.y + obj.height/ 2)
-                else:
+                    end_pos = (obj.x + obj.width,obj.y + obj.height / 2)
+                else: # vertical 
                     move_dir = 'y'
                     start_pos = (obj.x + obj.width / 2, obj.y)
-                    end_pos = (obj.x + obj.width / 2, obj.y + obj.height)
+                    end_pos = (obj.x + obj.width / 2,obj.y + obj.height)
+                groups = (self.all_sprites, self.semi_collision_sprites) if obj.properties['platform'] else (self.all_sprites, self.damage_sprites)
                 speed = obj.properties['speed']
-                MovingSprite((self.all_sprites, self.semi_collision_sprites), start_pos, end_pos, move_dir, speed)
+                MovingSprite(groups, start_pos, end_pos, move_dir, speed)
                 
     def run(self, dt):
         self.display_surface.fill(('black'))
