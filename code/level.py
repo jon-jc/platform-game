@@ -40,7 +40,7 @@ class Level:
                 else:
                     move_dir = 'y'
                     start_pos = (obj.x + obj.width / 2, obj.y)
-                    end_pos = (obj.x + obj.width / 2 + obj.width, obj.y + obj.height)
+                    end_pos = (obj.x + obj.width / 2, obj.y + obj.height)
                 speed = obj.properties['speed']
                 MovingSprite((self.all_sprites, self.semi_collision_sprites), start_pos, end_pos, move_dir, speed)
                 

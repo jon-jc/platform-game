@@ -92,7 +92,7 @@ class Player(pygame.sprite.Sprite):
             
             
     def check_contact(self):
-        floor_rect = pygame.Rect(self.hitbox_rect.bottomleft,(self.hitbox_rect.width, 4))
+        floor_rect = pygame.Rect(self.hitbox_rect.bottomleft,(self.hitbox_rect.width, 2))
         right_rect = pygame.Rect(self.hitbox_rect.topright + vector(0,self.hitbox_rect.height / 4),(2,self.hitbox_rect.height / 2))
         left_rect  = pygame.Rect(self.hitbox_rect.topleft + vector(-2,self.hitbox_rect.height / 4), (2,self.hitbox_rect.height / 2))
         collide_rects = [sprite.rect for sprite in self.collision_sprites]
@@ -116,15 +116,15 @@ class Player(pygame.sprite.Sprite):
                 if sprite.rect.colliderect(self.hitbox_rect):
                     if axis == 'horizontal':
                         # left
-                        if self.hitbox_rect.left <= sprite.rect.right and int(self.old_rect.left) >= sprite.old_rect.right:
+                        if self.hitbox_rect.left <= sprite.rect.right and int(self.old_rect.left) >= int(sprite.old_rect.right):
                             self.hitbox_rect.left = sprite.rect.right
 
                         # right
-                        if self.hitbox_rect.right >= sprite.rect.left and int(self.old_rect.right) <= sprite.old_rect.left:
+                        if self.hitbox_rect.right >= sprite.rect.left and int(self.old_rect.right) <= int(sprite.old_rect.left):
                             self.hitbox_rect.right = sprite.rect.left
                     else: # vertical
                         # top
-                        if self.hitbox_rect.top <= sprite.rect.bottom and int(self.old_rect.top) >= sprite.old_rect.bottom:
+                        if self.hitbox_rect.top <= sprite.rect.bottom and int(self.old_rect.top) >= int(sprite.old_rect.bottom):
                             self.hitbox_rect.top = sprite.rect.bottom
                             if hasattr(sprite, 'moving'):
                                 self.hitbox_rect.top += 6
@@ -138,7 +138,7 @@ class Player(pygame.sprite.Sprite):
         if not self.timers['platform skip'].active:
                 for sprite in self.semi_collision_sprites:
                     if sprite.rect.colliderect(self.hitbox_rect):
-                        if self.hitbox_rect.bottom >= sprite.rect.top and int(self.old_rect.bottom) <= sprite.old_rect.top:
+                        if self.hitbox_rect.bottom >= sprite.rect.top and int(self.old_rect.bottom) <= int(sprite.old_rect.top):
                             self.hitbox_rect.bottom = sprite.rect.top
                             if self.direction.y > 0:
                                 self.direction.y = 0
