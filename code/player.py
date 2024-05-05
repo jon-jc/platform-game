@@ -1,12 +1,12 @@
 from settings import *
 from timer import Timer
+from os.path import join
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, groups, collision_sprites):
+    def __init__(self, pos, groups, collision_sprites, semi_collision_sprites):
         super().__init__(groups)
-        self.image = pygame.Surface((48, 56))
-        self.image.fill('gray')
-
+        self.image = pygame.image.load(join('.', 'graphics', 'player', 'idle','0.png'))
+    
         #rects
         self.rect = self.image.get_frect(topleft=pos)
         self.old_rect = self.rect.copy()
@@ -19,13 +19,15 @@ class Player(pygame.sprite.Sprite):
         self.jump_height = 900
         #collision
         self.collision_sprites = collision_sprites
+        self.semi_collision_sprites = semi_collision_sprites
         self.on_surface = {'floor': False, 'left': False, 'right': False}
         self.platform = None
 
         #timer
         self.timers = {
             'wall jump': Timer(400),
-            'wall slide block': Timer(250)
+            'wall slide block': Timer(250),
+            'platform skip' : Timer(300)
         }
         
     def input(self):
@@ -38,6 +40,8 @@ class Player(pygame.sprite.Sprite):
                 input_vector.x = -1
             if keys[pygame.K_d]:
                 input_vector.x = 1
+            if keys[pygame.K_s]:
+                self.timers['platform skip'].activate()
 
                 
             self.direction.x = input_vector.normalize().x if input_vector else input_vector.x
@@ -75,12 +79,13 @@ class Player(pygame.sprite.Sprite):
             self.jump = False
         
         self.collision('vertical')
+        self.semi_collision()
         
         self.rect.center = self.rect.center
     def platform_move(self, dt):
         if self.platform:
             self.rect.topleft += self.platform.direction * self.platform.speed * dt
-        
+            
             
             
     def check_contact(self):
@@ -88,15 +93,15 @@ class Player(pygame.sprite.Sprite):
             right_rect = pygame.Rect(self.rect.topright + vector(0,self.rect.height / 4),(2,self.rect.height / 2))
             left_rect  = pygame.Rect(self.rect.topleft + vector(-2,self.rect.height / 4), (2,self.rect.height / 2))
             collide_rects = [sprite.rect for sprite in self.collision_sprites]
-            
+            semi_collide_rect = [sprite.rect for sprite in self.semi_collision_sprites]
 
             # collisions 
-            self.on_surface['floor'] = True if floor_rect.collidelist(collide_rects) >= 0 and self.direction.y >= 0 else False
+            self.on_surface['floor'] = True if floor_rect.collidelist(collide_rects) >= 0 or floor_rect.collidelist(semi_collide_rect) >=0 and self.direction.y >= 0 else False
             self.on_surface['right'] = True if right_rect.collidelist(collide_rects) >= 0 else False
             self.on_surface['left']  = True if left_rect.collidelist(collide_rects)  >= 0 else False
 
             self.platform = None
-            sprites =  self.collision_sprites.sprites()
+            sprites =  self.collision_sprites.sprites() + self.semi_collision_sprites.sprites()
             for sprite in [sprite for sprite in sprites if hasattr(sprite, 'moving')]:
                 if sprite.rect.colliderect(floor_rect):
                     self.platform = sprite
@@ -124,8 +129,17 @@ class Player(pygame.sprite.Sprite):
                         if self.rect.bottom >= sprite.rect.top and int(self.old_rect.bottom) <= int(sprite.old_rect.top):
                             self.rect.bottom = sprite.rect.top
                         self.direction.y = 0
+    
+    def semi_collision(self):
+        if not self.timers['platform skip'].active:
+            for sprite in self.semi_collision_sprites:
+                if sprite.rect.colliderect(self.rect):
+                    if self.rect.bottom >= sprite.rect.top and int(self.old_rect.bottom) <= int(sprite.old_rect.top):
+                        self.rect.bottom = sprite.rect.top
+                        if self.direction.y > 0:
+                            self.direction.y = 0
+                        
 
-                
     def update_timers(self):
         for timer in self.timers.values():
             timer.update()
